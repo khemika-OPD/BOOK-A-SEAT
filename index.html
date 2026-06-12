@@ -3,226 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบจองที่นั่งรถทัวร์หน่วยงาน</title>
+    <title>ระบบจองที่นั่งรถทัวร์หน่วยงาน (🔒 ปลอดภัย)</title>
     <style>
         :root {
-            --available-color: #2ecc71; /* สีเขียว */
-            --booked-color: #e74c3c;    /* สีแดง */
-            --selected-color: #f1c40f;  /* สีเหลือง */
+            --available-color: #2ecc71; 
+            --booked-color: #e74c3c;    
             --primary-blue: #2c3e50;
             --background-grey: #f5f6fa;
         }
-        
-        * {
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background-color: var(--background-grey);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .app-header {
-            text-align: center;
-            margin-bottom: 20px;
-            background: white;
-            padding: 20px 40px;
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            width: 100%;
-            max-width: 480px;
-        }
-
-        h1 {
-            color: var(--primary-blue);
-            margin: 0 0 8px 0;
-            font-size: 22px;
-        }
-
-        .subtitle {
-            color: #7f8c8d;
-            margin: 0;
-            font-size: 14px;
-        }
-        
-        /* แถบอธิบายสีสถานะ */
-        .legend {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 20px;
-            background: white;
-            padding: 12px 25px;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            width: 100%;
-            max-width: 480px;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .color-box {
-            width: 20px;
-            height: 20px;
-            border-radius: 6px;
-            box-shadow: inset 0 -2px 0 rgba(0,0,0,0.15);
-        }
-        
-        /* โครงสร้างตัวรถบัส */
-        .bus-wrapper {
-            background: #ffffff;
-            border: 4px solid #bdc3c7;
-            border-radius: 35px 35px 20px 20px;
-            width: 100%;
-            max-width: 420px;
-            padding: 25px 20px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.08);
-            position: relative;
-            margin-bottom: 30px;
-        }
-
-        .bus-front {
-            text-align: center;
-            font-weight: bold;
-            color: #7f8c8d;
-            border-bottom: 2px dashed #dcdde1;
-            padding-bottom: 15px;
-            margin-bottom: 25px;
-            font-size: 15px;
-            letter-spacing: 1px;
-        }
-
-        .bus-back {
-            text-align: center;
-            font-weight: bold;
-            color: #7f8c8d;
-            border-top: 2px dashed #dcdde1;
-            padding-top: 15px;
-            margin-top: 25px;
-            font-size: 15px;
-            letter-spacing: 1px;
-        }
-
-        /* การจัดแถวที่นั่งอิงตามผังในกระดาษ (ซ้าย 2 แถว | ทางเดินกลาง | ขวา 2 แถว) */
-        .grid-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr 45px 1fr 1fr; 
-            gap: 12px 10px;
-            margin-bottom: 12px;
-            align-items: center;
-        }
-        
-        /* ตกแต่งบล็อกเบาะนั่ง */
-        .seat-block {
-            background-color: var(--available-color);
-            color: white;
-            text-align: center;
-            padding: 12px 4px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 14px;
-            transition: all 0.2s ease;
-            box-shadow: inset 0 -4px 0 rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.05);
-            min-height: 48px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            user-select: none;
-        }
-
-        .seat-block:hover {
-            transform: translateY(-2px);
-            box-shadow: inset 0 -4px 0 rgba(0,0,0,0.15), 0 5px 10px rgba(0,0,0,0.15);
-        }
-
-        .seat-block.booked {
-            background-color: var(--booked-color);
-        }
-
-        .seat-name {
-            font-size: 10px;
-            font-weight: normal;
-            display: block;
-            margin-top: 3px;
-            background: rgba(0,0,0,0.18);
-            border-radius: 4px;
-            padding: 1px 4px;
-            width: 90%;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        /* บล็อกแสดงตำแหน่งประตูและทางออกฉุกเฉิน */
-        .special-zone {
-            font-size: 11px;
-            color: #e67e22;
-            background-color: #fdf2e9;
-            border: 1px dashed #f39c12;
-            text-align: center;
-            padding: 8px 2px;
-            border-radius: 6px;
-            font-weight: bold;
-        }
-
-        .aisle-space {
-            height: 100%;
-        }
-
-        /* ปุ่มสำหรับแอดมินล้างค่าข้อมูลทั้งหมด */
-        .admin-panel {
-            width: 100%;
-            max-width: 480px;
-            text-align: center;
-            margin-top: 10px;
-        }
-
-        .btn-reset {
-            background: #95a5a6;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: background 0.2s;
-        }
-
-        .btn-reset:hover {
-            background: #7f8c8d;
-        }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--background-grey); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        .app-header { text-align: center; margin-bottom: 20px; background: white; padding: 20px 40px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); width: 100%; max-width: 480px; }
+        h1 { color: var(--primary-blue); margin: 0 0 8px 0; font-size: 22px; }
+        .subtitle { color: #7f8c8d; margin: 0; font-size: 13px; }
+        .legend { display: flex; justify-content: center; gap: 20px; margin-bottom: 20px; background: white; padding: 12px 25px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); width: 100%; max-width: 480px; }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; }
+        .color-box { width: 20px; height: 20px; border-radius: 6px; box-shadow: inset 0 -2px 0 rgba(0,0,0,0.15); }
+        .bus-wrapper { background: #ffffff; border: 4px solid #bdc3c7; border-radius: 35px 35px 20px 20px; width: 100%; max-width: 420px; padding: 25px 20px; box-shadow: 0 15px 30px rgba(0,0,0,0.08); position: relative; margin-bottom: 30px; }
+        .bus-front { text-align: center; font-weight: bold; color: #7f8c8d; border-bottom: 2px dashed #dcdde1; padding-bottom: 15px; margin-bottom: 25px; font-size: 15px; }
+        .bus-back { text-align: center; font-weight: bold; color: #7f8c8d; border-top: 2px dashed #dcdde1; padding-top: 15px; margin-top: 25px; font-size: 15px; }
+        .grid-row { display: grid; grid-template-columns: 1fr 1fr 45px 1fr 1fr; gap: 12px 10px; margin-bottom: 12px; align-items: center; }
+        .seat-block { background-color: var(--available-color); color: white; text-align: center; padding: 12px 4px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; transition: all 0.2s ease; box-shadow: inset 0 -4px 0 rgba(0,0,0,0.15); min-height: 48px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .seat-block:hover { transform: translateY(-2px); }
+        .seat-block.booked { background-color: var(--booked-color); }
+        .seat-name { font-size: 10px; font-weight: normal; display: block; margin-top: 3px; background: rgba(0,0,0,0.18); border-radius: 4px; padding: 1px 4px; width: 90%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .special-zone { font-size: 11px; color: #e67e22; background-color: #fdf2e9; border: 1px dashed #f39c12; text-align: center; padding: 8px 2px; border-radius: 6px; font-weight: bold; }
+        .admin-panel { width: 100%; max-width: 480px; text-align: center; }
+        .btn-reset { background: #95a5a6; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 12px; }
     </style>
 </head>
 <body>
 
     <div class="app-header">
-        <h1>🚌 ระบบจองที่นั่งรถทัวร์ไปบางแสน2569 OPD สุดสวย </h1>
-        <p class="subtitle">คลิกที่เบาะว่างเพื่อจอง มั่นใจค่อยกดตกลงนะคะ หรือคลิกเบาะที่เต็มเพื่อยกเลิก</p>
+        <h1>🔒 ระบบจองที่นั่งรถทัวร์ไปบางแสน 2569 OPDสุดสวยทั้งคัน</h1>
+        <p class="subtitle">จองที่นั่งระบุรหัส 4 หลักเพื่อป้องกันคนอื่นกดยกเลิกแทน</p>
     </div>
 
     <div class="legend">
-        <div class="legend-item">
-            <div class="color-box" style="background-color: var(--available-color)"></div>
-            <span>ว่าง (🟢 จองได้)</span>
-        </div>
-        <div class="legend-item">
-            <div class="color-box" style="background-color: var(--booked-color)"></div>
-            <span>เต็ม (🔴 จองแล้ว)</span>
-        </div>
+        <div class="legend-item"><div class="color-box" style="background-color: var(--available-color)"></div> <span>ว่าง 🟢</span></div>
+        <div class="legend-item"><div class="color-box" style="background-color: var(--booked-color)"></div> <span>เต็ม 🔴 (ล็อกรหัส)</span></div>
     </div>
 
     <div class="bus-wrapper">
@@ -230,93 +49,82 @@
 
         <div class="grid-row">
             <div class="special-zone" style="grid-column: span 2;">🚪 ประตูขึ้นหน้า</div>
-            <div class="aisle-space"></div>
+            <div></div>
             <div class="seat-block" id="seat-1" onclick="handleSeatClick(1)">1</div>
             <div class="seat-block" id="seat-2" onclick="handleSeatClick(2)">2</div>
         </div>
-
         <div class="grid-row">
             <div class="seat-block" id="seat-3" onclick="handleSeatClick(3)">3</div>
             <div class="seat-block" id="seat-4" onclick="handleSeatClick(4)">4</div>
-            <div class="aisle-space"></div>
+            <div></div>
             <div class="seat-block" id="seat-5" onclick="handleSeatClick(5)">5</div>
             <div class="seat-block" id="seat-6" onclick="handleSeatClick(6)">6</div>
         </div>
-
         <div class="grid-row">
             <div class="seat-block" id="seat-7" onclick="handleSeatClick(7)">7</div>
             <div class="seat-block" id="seat-8" onclick="handleSeatClick(8)">8</div>
-            <div class="aisle-space"></div>
+            <div></div>
             <div class="seat-block" id="seat-9" onclick="handleSeatClick(9)">9</div>
             <div class="seat-block" id="seat-10" onclick="handleSeatClick(10)">10</div>
         </div>
-
         <div class="grid-row">
             <div class="seat-block" id="seat-11" onclick="handleSeatClick(11)">11</div>
             <div class="seat-block" id="seat-12" onclick="handleSeatClick(12)">12</div>
-            <div class="aisle-space"></div>
+            <div></div>
             <div class="seat-block" id="seat-13" onclick="handleSeatClick(13)">13</div>
             <div class="seat-block" id="seat-14" onclick="handleSeatClick(14)">14</div>
         </div>
-
         <div class="grid-row">
             <div class="seat-block" id="seat-15" onclick="handleSeatClick(15)">15</div>
             <div class="seat-block" id="seat-16" onclick="handleSeatClick(16)">16</div>
-            <div class="aisle-space"></div>
+            <div></div>
             <div class="seat-block" id="seat-17" onclick="handleSeatClick(17)">17</div>
             <div class="seat-block" id="seat-18" onclick="handleSeatClick(18)">18</div>
         </div>
-
         <div class="grid-row">
             <div class="seat-block" id="seat-19" onclick="handleSeatClick(19)">19</div>
             <div class="seat-block" id="seat-20" onclick="handleSeatClick(20)">20</div>
-            <div class="aisle-space"></div>
+            <div></div>
             <div class="seat-block" id="seat-21" onclick="handleSeatClick(21)">21</div>
             <div class="seat-block" id="seat-22" onclick="handleSeatClick(22)">22</div>
         </div>
-
         <div class="grid-row">
             <div class="special-zone" style="grid-column: span 2;">🚪 ประตูขึ้นกลาง</div>
-            <div class="aisle-space"></div>
+            <div></div>
             <div class="seat-block" id="seat-23" onclick="handleSeatClick(23)">23</div>
             <div class="seat-block" id="seat-24" onclick="handleSeatClick(24)">24</div>
         </div>
-
         <div class="grid-row">
             <div class="seat-block" id="seat-25" onclick="handleSeatClick(25)">25</div>
             <div class="seat-block" id="seat-26" onclick="handleSeatClick(26)">26</div>
-            <div class="aisle-space"></div>
+            <div></div>
             <div class="seat-block" id="seat-27" onclick="handleSeatClick(27)">27</div>
             <div class="seat-block" id="seat-28" onclick="handleSeatClick(28)">28</div>
         </div>
-
         <div class="grid-row">
             <div class="seat-block" id="seat-29" onclick="handleSeatClick(29)">29</div>
             <div class="seat-block" id="seat-30" onclick="handleSeatClick(30)">30</div>
-            <div class="aisle-space"></div>
+            <div></div>
             <div class="seat-block" id="seat-31" onclick="handleSeatClick(31)">31</div>
             <div class="seat-block" id="seat-32" onclick="handleSeatClick(32)">32</div>
         </div>
-
         <div class="grid-row">
             <div class="seat-block" id="seat-33" onclick="handleSeatClick(33)">33</div>
             <div class="seat-block" id="seat-34" onclick="handleSeatClick(34)">34</div>
-            <div class="aisle-space"></div>
+            <div></div>
             <div class="seat-block" id="seat-35" onclick="handleSeatClick(35)">35</div>
             <div class="seat-block" id="seat-36" onclick="handleSeatClick(36)">36</div>
         </div>
-
         <div class="grid-row">
             <div class="seat-block" id="seat-37" onclick="handleSeatClick(37)">37</div>
             <div class="seat-block" id="seat-38" onclick="handleSeatClick(38)">38</div>
-            <div class="aisle-space"></div>
+            <div></div>
             <div class="special-zone" style="grid-column: span 2; background-color: #fce4d6; border-color: #e74c3c; color: #c0392b;">🚨 ทางออกฉุกเฉิน</div>
         </div>
-
         <div class="grid-row">
             <div class="seat-block" id="seat-39" onclick="handleSeatClick(39)">39</div>
             <div class="seat-block" id="seat-40" onclick="handleSeatClick(40)">40</div>
-            <div class="aisle-space"></div>
+            <div></div>
             <div class="seat-block" id="seat-41" onclick="handleSeatClick(41)">41</div>
             <div class="seat-block" id="seat-42" onclick="handleSeatClick(42)">42</div>
         </div>
@@ -325,65 +133,79 @@
     </div>
 
     <div class="admin-panel">
-        <button class="btn-reset" onclick="clearAllSeats()">⚙️ รีเซ็ตระบบ (ล้างรายชื่อทั้งหมด)</button>
+        <button class="btn-reset" onclick="clearAllSeats()">⚙️ รีเซ็ตระบบ (ใช้รหัสผ่านแอดมิน)</button>
     </div>
 
     <script>
-        // ใช้ LocalStorage เพื่อให้ข้อมูลบันทึกคาไว้ในเบราว์เซอร์ แม้จะกดปิดหรือ Refresh หน้าจอก็ไม่หาย
-        let seatDatabase = JSON.parse(localStorage.getItem('bus_seats')) || {
-            5: { booked: true, name: "สมชาย ใจดี" },
-            20: { booked: true, name: "สมศรี รักเรียน" }
+        const MASTER_PIN = "2517"; // รหัสผ่านกลางของอาจารย์ (Admin)
+        
+        let seatDatabase = JSON.parse(localStorage.getItem('secure_bus_seats')) || {
+            5: { booked: true, name: "สมชาย ใจดี", pin: "0000" },
+            20: { booked: true, name: "สมศรี รักเรียน", pin: "9999" }
         };
 
-        // ฟังก์ชันในการวาดสีของเบาะทั้งหมดตามข้อมูลปัจจุบัน
         function renderSeats() {
             for (let i = 1; i <= 42; i++) {
                 let seatElement = document.getElementById(`seat-${i}`);
                 if (seatElement) {
                     if (seatDatabase[i] && seatDatabase[i].booked) {
                         seatElement.classList.add('booked');
-                        seatElement.innerHTML = `${i}<span class="seat-name">${seatDatabase[i].name}</span>`;
+                        seatElement.innerHTML = `${i}<span class="seat-name">🔒 ${seatDatabase[i].name}</span>`;
                     } else {
                         seatElement.classList.remove('booked');
                         seatElement.innerHTML = `${i}`;
                     }
                 }
             }
-            localStorage.setItem('bus_seats', JSON.stringify(seatDatabase));
+            localStorage.setItem('secure_bus_seats', JSON.stringify(seatDatabase));
         }
 
-        // ฟังก์ชันเมื่อมีการคลิกเบาะรถ
         function handleSeatClick(seatNumber) {
-            
-            // 🔴 กรณีเบาะเต็ม -> ถามเพื่อขอยกเลิก
+            // 🔴 เคสเบาะเต็ม -> ต้องใส่รหัสผ่านเพื่อปลดล็อก
             if (seatDatabase[seatNumber] && seatDatabase[seatNumber].booked) {
                 let currentName = seatDatabase[seatNumber].name;
-                let confirmCancel = confirm(`ที่นั่งหมายเลข ${seatNumber} ถูกจองโดยคุณ "${currentName}"\n\nคุณต้องการที่จะ "ยกเลิกการจอง" เพื่อคืนเบาะว่างใช่หรือไม่?`);
+                let userPin = prompt(`ที่นั่งหมายเลข ${seatNumber} ถูกจองโดยคุณ "${currentName}"\n\nหากต้องการยกเลิก กรุณากรอกรหัสผ่าน 4 หลักที่ตั้งไว้:`);
                 
-                if (confirmCancel) {
+                if (userPin === null) return; // กดยกเลิกไม่ทำอะไร
+
+                // ตรวจสอบรหัสผ่านว่าตรงกับที่จองไว้ หรือเป็นรหัสแอดมินของอาจารย์ไหม
+                if (userPin === seatDatabase[seatNumber].pin || userPin === MASTER_PIN) {
                     delete seatDatabase[seatNumber];
-                    alert(`ยกเลิกการจองที่นั่งหมายเลข ${seatNumber} เรียบร้อยแล้วค่ะ`);
+                    alert(`ปลดล็อกและยกเลิกการจองที่นั่งหมายเลข ${seatNumber} สำเร็จค่ะ`);
                     renderSeats();
+                } else {
+                    alert("❌ รหัสผ่านไม่ถูกต้อง! ไม่สามารถยกเลิกที่นั่งของผู้อื่นได้ค่ะ");
                 }
                 return;
             }
 
-            // 🟢 กรณีเบาะว่าง -> ใส่ชื่อเพื่อกดจอง
-            let userName = prompt(`คุณกำลังเลือกจองที่นั่งหมายเลข ${seatNumber}\nกรุณากรอก ชื่อ-นามสกุล ของผู้เดินทาง:`);
-            
-            if (userName && userName.trim() !== "") {
-                seatDatabase[seatNumber] = { booked: true, name: userName.trim() };
-                alert(`จองที่นั่งหมายเลข ${seatNumber} สำเร็จแล้วค่ะ!`);
-                renderSeats();
+            // 🟢 เคสเบาะว่าง -> ใส่ชื่อ และ ตั้งรหัสผ่าน
+            let userName = prompt(`คุณกำลังเลือกจองที่นั่งหมายเลข ${seatNumber}\n1. กรุณากรอก ชื่อ-นามสกุล ของผู้เดินทาง:`);
+            if (!userName || userName.trim() === "") return;
+
+            let setPin = prompt(`ที่นั่งหมายเลข ${seatNumber}\n2. กรุณาตั้งรหัสผ่าน 4 หลัก (เพื่อใช้เวลาขอยกเลิกเอง):`);
+            if (!setPin || setPin.trim().length < 4) {
+                alert("❌ การจองไม่สำเร็จ! เนื่องจากต้องตั้งรหัสผ่านอย่างน้อย 4 หลักค่ะ");
+                return;
             }
+
+            seatDatabase[seatNumber] = { 
+                booked: true, 
+                name: userName.trim(), 
+                pin: setPin.trim() 
+            };
+            alert(`จองที่นั่งหมายเลข ${seatNumber} สำเร็จ! (โปรดจำรหัสผ่านสำหรับยกเลิกไว้ด้วยนะคะ)`);
+            renderSeats();
         }
 
-        // ฟังก์ชันล้างหน้ากระดานทั้งหมดสำหรับอาจารย์ขึ้นทริปใหม่
         function clearAllSeats() {
-            if (confirm("คุณแน่ใจใช่หรือไม่ที่จะรีเซ็ตล้างรายชื่อทั้ง 42 ที่นั่งให้กลับเป็นสีเขียวทั้งหมด?")) {
+            let adminPin = prompt("กรุณากรอกรหัสผ่าน Admin เพื่อล้างระบบทั้งหมด:");
+            if (adminPin === MASTER_PIN) {
                 seatDatabase = {};
                 renderSeats();
-                alert("ระบบถูกเคลียร์เป็นเบาะว่างทั้งหมดแล้วค่ะ");
+                alert("ระบบได้รับการรีเซ็ตเป็นเบาะว่างทั้งหมดเรียบร้อยแล้วค่ะอาจารย์");
+            } else if (adminPin !== null) {
+                alert("❌ รหัสผ่านแอดมินไม่ถูกต้อง!");
             }
         }
 
