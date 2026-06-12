@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบจองที่นั่งรถทัวร์หน่วยงาน</title>
+    <style>
+        :root {
+            --available-color: #2ecc71; /* สีเขียว */
+            --booked-color: #e74c3c;    /* สีแดง */
+            --selected-color: #f1c40f;  /* สีเหลือง */
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f6fa;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h2 { color: #2c3e50; margin-bottom: 5px; }
+        .subtitle { color: #7f8c8d; margin-bottom: 20px; }
+        
+        /* สัญลักษณ์สี */
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+        .color-box { width: 18px; height: 18px; border-radius: 4px; }
+        
+        /* โครงสร้างตัวรถบัส */
+        .bus-container {
+            background: #ffffff;
+            border: 3px solid #bdc3c7;
+            border-radius: 20px 20px 10px 10px;
+            width: 360px;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        .bus-header {
+            text-align: center;
+            font-weight: bold;
+            color: #95a5a6;
+            border-bottom: 2px dashed #bdc3c7;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .bus-tail {
+            text-align: center;
+            font-weight: bold;
+            color: #95a5a6;
+            border-top: 2px dashed #bdc3c7;
+            padding-top: 10px;
+            margin-top: 20px;
+        }
+
+        /* จัดแถวที่นั่งอิงตามรูปถ่าย (ซ้าย 2 ทางเดิน ขวา 2) */
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 40px 1fr 1fr; /* 4 เบาะ มีทางเดินตรงกลางกว้าง 40px */
+            gap: 10px;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+        
+        /* ตกแต่งบล็อกเบาะนั่ง */
+        .seat {
+            background-color: var(--available-color);
+            color: white;
+            text-align: center;
+            padding: 12px 0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            box-shadow: inset 0 -3px 0 rgba(0,0,0,0.15);
+        }
+        .seat:hover { transform: scale(1.05); }
+        .seat.booked {
+            background-color: var(--booked-color);
+            cursor: not-allowed;
+        }
+        .seat.booked:hover { transform: none; }
+        
+        /* บล็อกเปล่าสำหรับจุดที่เป็นประตูทางขึ้น/ทางออกฉุกเฉิน */
+        .empty-space {
+            font-size: 11px;
+            color: #95a5a6;
+            text-align: center;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>🚌 ระบบจองที่นั่งรถทัวร์หน่วยงาน</h2>
+    <div class="subtitle">คลิกเลือกที่นั่งที่ต้องการเพื่อทำการจอง</div>
+
+    <div class="legend">
+        <div class="legend-item"><div class="color-box" style="background-color: var(--available-color)"></div> ว่าง (🟢)</div>
+        <div class="legend-item"><div class="color-box" style="background-color: var(--booked-color)"></div> เต็ม (🔴)</div>
+    </div>
+
+    <div class="bus-container">
+        <div class="bus-header">หน้ารถ (คนขับ)</div>
+
+        <div class="row">
+            <div class="empty-space" style="grid-column: span 2;">ประตูขึ้นหน้า</div>
+            <div></div> <div class="seat" id="seat-1" onclick="bookSeat(1)">1</div>
+            <div class="seat" id="seat-2" onclick="bookSeat(2)">2</div>
+        </div>
+
+        <div class="row">
+            <div class="seat" id="seat-3" onclick="bookSeat(3)">3</div>
+            <div class="seat" id="seat-4" onclick="bookSeat(4)">4</div>
+            <div></div>
+            <div class="seat" id="seat-5" onclick="bookSeat(5)">5</div>
+            <div class="seat" id="seat-6" onclick="bookSeat(6)">6</div>
+        </div>
+
+        <div class="row">
+            <div class="seat" id="seat-7" onclick="bookSeat(7)">7</div>
+            <div class="seat" id="seat-8" onclick="bookSeat(8)">8</div>
+            <div></div>
+            <div class="seat" id="seat-9" onclick="bookSeat(9)">9</div>
+            <div class="seat" id="seat-10" onclick="bookSeat(10)">10</div>
+        </div>
+
+        <div class="row">
+            <div class="seat" id="seat-11" onclick="bookSeat(11)">11</div>
+            <div class="seat" id="seat-12" onclick="bookSeat(12)">12</div>
+            <div></div>
+            <div class="seat" id="seat-13" onclick="bookSeat(13)">13</div>
+            <div class="seat" id="seat-14" onclick="bookSeat(14)">14</div>
+        </div>
+
+        <div class="row">
+            <div class="seat" id="seat-15" onclick="bookSeat(15)">15</div>
+            <div class="seat" id="seat-16" onclick="bookSeat(16)">16</div>
+            <div></div>
+            <div class="seat" id="seat-17" onclick="bookSeat(17)">17</div>
+            <div class="seat" id="seat-18" onclick="bookSeat(18)">18</div>
+        </div>
+
+        <div class="row">
+            <div class="seat" id="seat-19" onclick="bookSeat(19)">19</div>
+            <div class="seat" id="seat-20" onclick="bookSeat(20)">20</div>
+            <div></div>
+            <div class="seat" id="seat-21" onclick="bookSeat(21)">21</div>
+            <div class="seat" id="seat-22" onclick="bookSeat(22)">22</div>
+        </div>
+
+        <div class="row">
+            <div class="empty-space" style="grid-column: span 2;">ประตูขึ้นกลางรถ</div>
+            <div></div>
+            <div class="seat" id="seat-23" onclick="bookSeat(23)">23</div>
+            <div class="seat" id="seat-24" onclick="bookSeat(24)">24</div>
+        </div>
+
+        <div class="row">
+            <div class="seat" id="seat-25" onclick="bookSeat(25)">25</div>
+            <div class="seat" id="seat-26" onclick="bookSeat(26)">26</div>
+            <div></div>
+            <div class="seat" id="seat-27" onclick="bookSeat(27)">27</div>
+            <div class="seat" id="seat-28" onclick="bookSeat(28)">28</div>
+        </div>
+
+        <div class="row">
+            <div class="seat" id="seat-29" onclick="bookSeat(29)">29</div>
+            <div class="seat" id="seat-30" onclick="bookSeat(30)">30</div>
+            <div></div>
+            <div class="seat" id="seat-31" onclick="bookSeat(31)">31</div>
+            <div class="seat" id="seat-32" onclick="bookSeat(32)">32</div>
+        </div>
+
+        <div class="row">
+            <div class="seat" id="seat-33" onclick="bookSeat(33)">33</div>
+            <div class="seat" id="seat-34" onclick="bookSeat(34)">34</div>
+            <div></div>
+            <div class="seat" id="seat-35" onclick="bookSeat(35)">35</div>
+            <div class="seat" id="seat-36" onclick="bookSeat(36)">36</div>
+        </div>
+
+        <div class="row">
+            <div class="seat" id="seat-37" onclick="bookSeat(37)">37</div>
+            <div class="seat" id="seat-38" onclick="bookSeat(38)">38</div>
+            <div></div>
+            <div class="empty-space" style="grid-column: span 2;">ทางออกฉุกเฉิน</div>
+        </div>
+
+        <div class="row">
+            <div class="seat" id="seat-39" onclick="bookSeat(39)">39</div>
+            <div class="seat" id="seat-40" onclick="bookSeat(40)">40</div>
+            <div></div>
+            <div class="seat" id="seat-41" onclick="bookSeat(41)">41</div>
+            <div class="seat" id="seat-42" onclick="bookSeat(42)">42</div>
+        </div>
+
+        <div class="bus-tail">ท้ายรถ</div>
+    </div>
+
+    <script>
+        // จำลองฐานข้อมูลที่นั่ง (ในอนาคตสามารถเชื่อม API กับ Google Sheets ได้)
+        // ทดสอบใส่ข้อมูลว่าที่นั่ง 5 และ 20 มีคนจองแล้ว (จะกลายเป็นสีแดง)
+        let seatDatabase = {
+            5: { booked: true, name: "สมชาย ใจดี" },
+            20: { booked: true, name: "สมศรี รักเรียน" }
+        };
+
+        // ฟังก์ชันโหลดสถานะสีตอนเปิดแอป
+        function updateSeatDisplay() {
+            for (let i = 1; i <= 42; i++) {
+                let seatElement = document.getElementById(`seat-${i}`);
+                if (seatElement) {
+                    if (seatDatabase[i] && seatDatabase[i].booked) {
+                        seatElement.classList.add('booked');
+                        seatElement.innerHTML = `X<br><span style="font-size:10px;">${seatDatabase[i].name}</span>`;
+                    }
+                }
+            }
+        }
+
+        // ฟังก์ชันเมื่อผู้ใช้คลิกจองที่นั่ง
+        function bookSeat(seatNumber) {
+            // เช็คว่าที่นั่งนั้นเป็นสีแดงหรือยัง
+            if (seatDatabase[seatNumber] && seatDatabase[seatNumber].booked) {
+                alert(`ที่นั่งหมายเลข ${seatNumber} ถูกจองโดยคุณ ${seatDatabase[seatNumber].name} แล้วค่ะ`);
+                return;
+            }
+
+            // แสดงหน้าต่าง Pop-up สวยๆ ให้กรอกชื่อ
+            let userName = prompt(`คุณกำลังเลือกจองที่นั่งหมายเลข ${seatNumber}\nกรุณากรอก ชื่อ-นามสกุล ของคุณ:`);
+            
+            if (userName && userName.trim() !== "") {
+                // บันทึกข้อมูลลงฐานข้อมูลชั่วคราว และเปลี่ยนเป็นสีแดงทันที
+                seatDatabase[seatNumber] = { booked: true, name: userName };
+                alert(`จองที่นั่งหมายเลข ${seatNumber} สำเร็จแล้ว!`);
+                updateSeatDisplay();
+            }
+        }
+
+        // เปิดใช้งานระบบทันทีเมื่อโหลดหน้าเว็บ
+        window.onload = updateSeatDisplay;
+    </script>
+</body>
+</html>
